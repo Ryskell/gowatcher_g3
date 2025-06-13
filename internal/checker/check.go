@@ -1,29 +1,38 @@
 package checker
 
 import (
+	"gowatcher_g3/internal/config"
 	"net/http"
 	"time"
 )
 
 // CheckResult en majuscule pour exporter le type
 type CheckResult struct {
-	Target string
-	Status string
-	Err    error
+	InputTarget config.InputTarget
+	Status      string
+	Err         error
 }
 
-func CheckURL(url string) CheckResult {
+type ReportEntry struct {
+	Name   string
+	URL    string
+	Owner  string
+	Status string
+	ErrMsg string
+}
+
+func CheckURL(target config.InputTarget) CheckResult {
 	client := http.Client{
 		Timeout: time.Second * 3,
 	}
 
-	resp, err := client.Get(url)
+	resp, err := client.Get(target.URL)
 	if err != nil {
 
 		return CheckResult{
-			Target: url,
+			InputTarget: target,
 			Err: &UnreachableURLError{
-				URL: url,
+				URL: target.URL,
 				Err: err,
 			},
 		}
